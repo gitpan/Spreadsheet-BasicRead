@@ -1,5 +1,9 @@
 Revision history for Perl extension Spreadsheet::BasicRead.
 
+Revision 1.3  2004/09/30 12:32:25  Greg
+- Update to currentSheetNum and getNextSheet functions
+- Added dumpSS.pl and xlsgrep.pl applications as usefull sample apps.
+
 Revision 1.2  2004/08/21 02:30:29  Greg
 - Added setHeadingRow and setRow
 - Updated documentation

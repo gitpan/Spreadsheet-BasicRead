@@ -8,13 +8,16 @@
 #--------------------------------------------------
 package Spreadsheet::BasicRead;
 
-$VERSION = sprintf("%d.%02d", q'$Revision: 1.3 $' =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q'$Revision: 1.4 $' =~ /(\d+)\.(\d+)/);
 #--------------------------------------------------
 #
 #
 my $CVS_Log = q{
 
 $Log: BasicRead.pm,v $
+Revision 1.4  2004/10/01 11:02:21  Greg
+- Updated getNextRow to skip sheets that have nothing on them
+
 Revision 1.3  2004/09/30 12:32:25  Greg
 - Update to currentSheetNum and getNextSheet functions
 
@@ -263,7 +266,8 @@ sub getNextRow
 
 	# Find the next row and make sure it's valid
 	my $row = ++$self->{ssSheetRow};
-	return undef if ($row > $self->{ssSheet}->{MaxRow});
+	# Check to make sure there is something on this sheet
+	return undef if (! defined($self->{ssSheet}->{MaxRow}) || $row > $self->{ssSheet}->{MaxRow});
 
 	# If row is zero or negative then this is the first row
 	return $self->getFirstRow() if ($row <= 0);
@@ -578,7 +582,7 @@ the same terms as Perl itself.
 
 =head1 CVS ID
 
-$Id: BasicRead.pm,v 1.3 2004/09/30 12:32:25 Greg Exp $
+$Id: BasicRead.pm,v 1.4 2004/10/01 11:02:21 Greg Exp $
 
 =cut
 

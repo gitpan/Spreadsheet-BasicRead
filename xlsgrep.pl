@@ -14,7 +14,7 @@ unless ($ARGV[0])
 	die "SYNTAX: xlsgrep.pl regex_pattern\n";
 }
 
-my $pattern = qr/$ARGV[0]/;
+my $pattern = qr/$ARGV[0]/o;
 
 # Find all the .xls files and check the for any cells that match the pattern
 find(\&chkXLS, '.');
@@ -35,10 +35,15 @@ sub chkXLS
 sub searchXLS
 {
 	my ($xlsFileName, $fullPath) = @_;
+	my $ss;
 
 	# Open the spreadsheet ready for reading
-	my $ss = new Spreadsheet::BasicRead($xlsFileName) ||
-		die "Could not open '$xlsFileName': $!";
+	unless ($ss = new Spreadsheet::BasicRead($xlsFileName))
+	{
+		print STDERR "Could not open '$fullPath': $!";
+		return;
+	}
+
 
 	# Starting at the first sheet, process each row at a time
 	do
@@ -106,11 +111,17 @@ the same terms as Perl itself.
 
 =head1 CVS ID
 
-$Id: xlsgrep.pl,v 1.1 2004/09/30 12:31:26 Greg Exp $
+$Id: xlsgrep.pl,v 1.3 2004/10/03 04:58:20 Greg Exp $
 
 =head1 CVS LOG
 
 $Log: xlsgrep.pl,v $
+Revision 1.3  2004/10/03 04:58:20  Greg
+- Test of open of spreadsheet and return if failure
+
+Revision 1.2  2004/10/01 10:59:30  Greg
+- Replaced the die with print to STDERR when you can't open a spreadsheet
+
 Revision 1.1  2004/09/30 12:31:26  Greg
 - Initial development
 
