@@ -1,3 +1,9 @@
 Revision history for Perl extension Spreadsheet::BasicRead.
 
+Revision 1.2  2004/08/21 02:30:29  Greg
+- Added setHeadingRow and setRow
+- Updated documentation
+- Remove irrelavant use lib;
+
+
 Release 1.01, intial release to CPAN

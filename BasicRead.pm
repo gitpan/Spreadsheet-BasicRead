@@ -8,30 +8,24 @@
 #--------------------------------------------------
 package Spreadsheet::BasicRead;
 
-$VERSION = sprintf("%d.%02d", q'$Revision: 1.1.1.1 $' =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q'$Revision: 1.2 $' =~ /(\d+)\.(\d+)/);
 #--------------------------------------------------
 #
 #
 my $CVS_Log = q{
 
-$Log
+$Log: BasicRead.pm,v $
+Revision 1.2  2004/08/21 02:30:29  Greg
+- Added setHeadingRow and setRow
+- Updated documentation
+- Remove irrelavant use lib;
+
+Revision 1.1.1.1  2004/07/31 07:45:02  Greg
+- Initial release to CPAN
 
 };
 #
 #
-#
-
-
-#-- Define the locations of the ARS and related modules
-use lib qw(
-	.
-	/opt/ar/perl/lib/perl5/5.6.0/aix
-	/opt/ar/perl/lib/perl5/5.6.0
-	/opt/ar/perl/lib/perl5/site_perl/5.6.0/aix
-	/opt/ar/perl/lib/perl5/site_perl/5.6.0
-	/opt/ar/perl/lib/perl5/site_perl
-);
-
 
 #-- Required Modules
 #-------------------
@@ -92,9 +86,14 @@ sub new
 		$self->openSpreadsheet($args{fileName});
 	}
 
+	# Skip headings (if defined) else skip the first row
+	if (defined $args{skipHeadings})
+	{
+		$self->{skipHeadings} = $args{skipHeadings};
+	}
+
 	return $self;
 }
-
 
 
 sub openSpreadsheet
@@ -153,9 +152,14 @@ sub setCurrentSheetNum
 {
 	my $self = shift;
 
-	return $self->{currentSheetNum} = $_[0];
+	return $self->{currentSheetNum} = $_[0] || 0;
 }
 
+
+sub skipHeadings
+{
+	$_[0]->{skipHeadings} = $_[1] || 0;
+}
 
 
 sub getNextSheet
@@ -203,13 +207,24 @@ sub cellValue
 
 
 
+sub setHeadingRow
+{
+	my $self = shift;
+	my $headingRow = shift;
+
+	$self->{headingRow} = ($headingRow >= $self->{ssSheet}->{MinRow} &&
+	                       $headingRow <= $self->{ssSheet}->{MaxRow}) ?
+						   $headingRow : $self->{ssSheet}->{MinRow};
+}
+
+
 sub getFirstRow
 {
 	my $self = shift;
 
 	return undef unless defined($self->{ssSheet});
 
-	my $row = $self->{ssSheet}->{MinRow};
+	my $row = $self->{headingRow} || $self->{ssSheet}->{MinRow};
 	$self->{ssSheetRow} = $row;
 
 
@@ -231,7 +246,7 @@ sub getFirstRow
 	}
 
 
-	return ($self->{skipBlankRows} && $blank == 0) ? $self->getNextRow() : \@data;
+	return ($self->{skipHeadings} || ($self->{skipBlankRows} && $blank == 0)) ? $self->getNextRow() : \@data;
 }
 
 
@@ -271,6 +286,11 @@ sub getNextRow
 	return ($self->{skipBlankRows} && $blank == 0) ? $self->getNextRow() : \@data;
 }
 
+
+sub setRow
+{
+	$_[0]->{ssSheetRow} = ($_[1] || 0) -1;
+}
 
 
 sub logexp
@@ -324,7 +344,15 @@ Spreadsheet::BasicRead - Methods to easily read data from spreadsheets
 
 Provides methods for simple reading of a Excel spreadsheet row
 at a time returning the row as an array of column values.
-Properties can be set so that blank rows are skipped
+Properties can be set so that blank rows are skipped.  The heading
+row can also be set so that reading always starts at this row which
+is the first row of the sheet by default.
+Properties can also be set to skip the heading row.
+
+ Note 1. Leading and trailing white space is removed from cell values.
+
+ Note 2. Row and column references are zero (0) indexed. That is cell
+         A1 is row 0, column 0
 
 
 =head1 SYNOPSIS
@@ -397,7 +425,9 @@ The following named arguments are available:
 =item skipHeadings
 
 Don't output the headings line in the first call to
-L<'getNextRow'|"getNextRow"> if true.
+L<'getNextRow'|"getNextRow"> if true.  This is the first row of the
+spreadsheet unless the setHeadingRow function has been called to set
+the heading row.
 
 
 =item skipBlankRows
@@ -477,7 +507,7 @@ Returns the value of the cell defined by (row, col)in the current sheet.
 =head2 getFirstRow()
 
 Returns the first row of data from the spreadsheet (possibly skipping the
-column headings  L<'skipHeadings'|"new">) as an array reference.
+column headings  L<'skipHeadings'|"new"> as an array reference.
 
 
 =head2 setHeadingRow(rowNumber)
@@ -489,6 +519,15 @@ not relavent.
 B<Note:> the row (and column) numbers are zero indexed.
 
 
+=head2 setRow(rowNumber)
+
+Sets the row to be returned by the next call to L<'getNextRow'|"getNextRow">.
+Note that if the heading row has been defined and the row number set with setRow
+is less than the heading row, data will be returned from the heading row regardless,
+unless skip heading row has been set, in which case it will be the row after the
+heading row.
+
+
 =head2 logexp(message)
 
 Logs an exception message (can be a list of strings) using the File::Log
@@ -497,7 +536,7 @@ object if it was defined and then calls die message.
 
 =head2 logmsg(debug, message)
 
-If a File::Log object was passed as a named argument L<'new'|"new">) and
+If a File::Log object was passed as a named argument L<'new'|"new"> and
 if 'debug' (integer value) is equal to or greater than the current debug
 Level (see File::Log) then the message is added to the log file.
 
@@ -509,7 +548,10 @@ STDERR.
 
 None, however please contact the author at gng@cpan.org should you
 find any problems and I will endevour to resolve then as soon as
-possible
+possible.
+
+If you have any enhancement suggestions please send me
+an email and I will try to accommodate your suggestion.
 
 
 =head1 SEE ALSO
@@ -520,8 +562,8 @@ Kawai Takanori (Hippo2000) kwitknr@cpan.org
 
 =head1 AUTHOR
 
-Greg George, IT Technology Solutions P/L, Australia
-Mobile: +61-404-892-159, Email: gng@cpan.org
+ Greg George, IT Technology Solutions P/L, Australia
+ Mobile: +61-404-892-159, Email: gng@cpan.org
 
 
 =head1 LICENSE
@@ -533,7 +575,7 @@ the same terms as Perl itself.
 
 =head1 CVS ID
 
-$Id: BasicRead.pm,v 1.1.1.1 2004/07/31 07:45:02 Greg Exp $
+$Id: BasicRead.pm,v 1.2 2004/08/21 02:30:29 Greg Exp $
 
 =cut
 
