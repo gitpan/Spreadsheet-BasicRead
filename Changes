@@ -2,6 +2,9 @@ Revision history for Perl extension Spreadsheet::BasicRead.
 
 
 BasicRead
+Revision 1.6  2005/02/21 09:54:08  Greg
+- Update to setCurrentSheetNum() so that the new sheet is handled by BasicRead functions
+
 Revision 1.5  2004/10/08 22:40:27  Greg
 - Changed cellValue to return '' for an empty cell rather than undef (requested by D D Allen).
   Old functionality can be maintained by setting named parameter 'oldCell' to true in call to new().

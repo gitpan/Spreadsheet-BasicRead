@@ -8,7 +8,7 @@
 #--------------------------------------------------
 package Spreadsheet::BasicRead;
 
-$VERSION = sprintf("%d.%02d", q'$Revision: 1.5 $' =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q'$Revision: 1.6 $' =~ /(\d+)\.(\d+)/);
 #--------------------------------------------------
 #
 
@@ -139,9 +139,19 @@ sub currentSheetName
 
 sub setCurrentSheetNum
 {
-	my $self = shift;
+	my $self  = shift;
+	my $shtNo = shift || 0;
 
-	return $self->{currentSheetNum} = $_[0] || 0;
+	# Check if this is a valid value
+	return undef unless ($shtNo >= 0 && $shtNo <= $self->numSheets());
+
+	# Set the new sheet number and return the sheet.
+	$self->{currentSheetNum} = $shtNo;
+	$self->{ssSheet}         = $self->{ssBook}->{Worksheet}[$shtNo];
+	$self->{ssSheetRow}      = $self->{ssSheet}->{MinRow} if (defined($self->{ssSheet}));
+	$self->{ssSheetCol}      = $self->{ssSheet}->{MinCol} if (defined($self->{ssSheet}));
+	$self->{ssSheetRow}      = -7;  # Flag to getNextRow that this is the first row
+	return $self->{ssSheet};
 }
 
 
@@ -604,12 +614,15 @@ the same terms as Perl itself.
 
 =head1 CVS ID
 
-$Id: BasicRead.pm,v 1.5 2004/10/08 22:40:27 Greg Exp $
+$Id: BasicRead.pm,v 1.6 2005/02/21 09:54:08 Greg Exp $
 
 
 =head1 UPDATE HISTORY
 
  $Log: BasicRead.pm,v $
+ Revision 1.6  2005/02/21 09:54:08  Greg
+ - Update to setCurrentSheetNum() so that the new sheet is handled by BasicRead functions
+
  Revision 1.5  2004/10/08 22:40:27  Greg
  - Changed cellValue to return '' for an empty cell rather than undef (requested by D D Allen).  Old functionality can be maintained by setting named parameter 'oldCell' to true in call to new().
  - Added examples to POD
