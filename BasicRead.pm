@@ -8,29 +8,8 @@
 #--------------------------------------------------
 package Spreadsheet::BasicRead;
 
-$VERSION = sprintf("%d.%02d", q'$Revision: 1.4 $' =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q'$Revision: 1.5 $' =~ /(\d+)\.(\d+)/);
 #--------------------------------------------------
-#
-#
-my $CVS_Log = q{
-
-$Log: BasicRead.pm,v $
-Revision 1.4  2004/10/01 11:02:21  Greg
-- Updated getNextRow to skip sheets that have nothing on them
-
-Revision 1.3  2004/09/30 12:32:25  Greg
-- Update to currentSheetNum and getNextSheet functions
-
-Revision 1.2  2004/08/21 02:30:29  Greg
-- Added setHeadingRow and setRow
-- Updated documentation
-- Remove irrelavant use lib;
-
-Revision 1.1.1.1  2004/07/31 07:45:02  Greg
-- Initial release to CPAN
-
-};
-#
 #
 
 #-- Required Modules
@@ -55,6 +34,7 @@ sub new
 	bless($self, $class);
 
 	$self->{skipBlankRows} = 0;
+	$self->{oldCell}       = 0;
 
 	# Do we have any arguments to process
 	#------------------------------------
@@ -97,6 +77,9 @@ sub new
 	{
 		$self->{skipHeadings} = $args{skipHeadings};
 	}
+
+	# Do we return undef on empty cells (old mode) or ''
+	$self->{oldCell} = $args{oldCell} if $args{oldCell};
 
 	return $self;
 }
@@ -207,7 +190,7 @@ sub getFirstSheet
 sub cellValue
 {
 	my ($self, $r, $c) = @_;
-	return undef unless (defined($self->{ssSheet}) && defined($self->{ssSheet}->{Cells}[$r][$c]));
+	return ($self->{oldCell}? undef : '') unless (defined($self->{ssSheet}) && defined($self->{ssSheet}->{Cells}[$r][$c]));
 	return $self->{ssSheet}->{Cells}[$r][$c]->Value;
 }
 
@@ -423,6 +406,7 @@ which is taken as the filename of the spreadsheet of as named arguments.
                   skipHeadings  => 1,
                   skipBlankRows => 1,
                   log           => $log,
+                  oldCell       => 1,
               );
 
 The following named arguments are available:
@@ -452,7 +436,18 @@ If not provided error conditions are logged to STDERR
 
 The name (and optionally path) of the spreadsheet file to process.
 
+
+=item oldCell
+
+Empty cells returned undef pre version 1.5.  They now return ''.
+
+The old functionality can be turned on by setting argument I<oldCell> to true
+
 =back
+
+B<Note that new will die if the spreadsheet can not be successfully opened.>
+As such you may wish to wrap the call to new in a eval block. See L<xlsgrep|EXAMPLE APPLICATIONS>
+for an example of when this might be desirable.
 
 =head2 getNextRow()
 
@@ -551,6 +546,31 @@ If a File::Log object was not passed to new then the message is output to
 STDERR.
 
 
+=head1 EXAMPLE APPLICATIONS
+
+Two sample (but usefull) applications are included with this distribution.
+
+The simplest is dumpSS.pl which will dump the entire contents of a spreadsheet
+to STDOUT.  Each sheet is preceeded by the sheet name (enclosed in ***) on
+a line, followed by each row of the spreadsheet, with cell values separated by
+the pipe '|' character.  There is no special handling provided for cells containing
+the pipe character.
+
+A more complete example is xlsgrep.  This application can be used to do a perl
+pattern match for cell values within xls files in the current and sub directories.
+There are no special grep flags, however this should not be a problem since perl's
+pattern matching allows for most requirements within the search pattern.
+
+ Usage is: xlsgrep.pl pattern
+
+To do a case insensative search for "Some value" in any xls file in the current directory
+you would use:
+
+ xlsgrep '(?i)Some value'
+
+For further details, see each applications POD.
+
+
 =head1 KNOWN ISSUES
 
 None, however please contact the author at gng@cpan.org should you
@@ -565,6 +585,8 @@ an email and I will try to accommodate your suggestion.
 
 Spreadsheet:ParseExcel on CPAN does all the hard work, thanks
 Kawai Takanori (Hippo2000) kwitknr@cpan.org
+
+The included applications dumpSS.pl and xlsgrep.pl
 
 
 =head1 AUTHOR
@@ -582,7 +604,30 @@ the same terms as Perl itself.
 
 =head1 CVS ID
 
-$Id: BasicRead.pm,v 1.4 2004/10/01 11:02:21 Greg Exp $
+$Id: BasicRead.pm,v 1.5 2004/10/08 22:40:27 Greg Exp $
+
+
+=head1 UPDATE HISTORY
+
+ $Log: BasicRead.pm,v $
+ Revision 1.5  2004/10/08 22:40:27  Greg
+ - Changed cellValue to return '' for an empty cell rather than undef (requested by D D Allen).  Old functionality can be maintained by setting named parameter 'oldCell' to true in call to new().
+ - Added examples to POD
+
+ Revision 1.4  2004/10/01 11:02:21  Greg
+ - Updated getNextRow to skip sheets that have nothing on them
+
+ Revision 1.3  2004/09/30 12:32:25  Greg
+ - Update to currentSheetNum and getNextSheet functions
+
+ Revision 1.2  2004/08/21 02:30:29  Greg
+ - Added setHeadingRow and setRow
+ - Updated documentation
+ - Remove irrelavant use lib;
+
+ Revision 1.1.1.1  2004/07/31 07:45:02  Greg
+ - Initial release to CPAN
+
 
 =cut
 

@@ -35,11 +35,13 @@
 		<LI><A HREF="#logmsg(debug, message)">logmsg(debug, message)</A></LI>
 	</UL>
 
+	<LI><A HREF="#example applications">EXAMPLE APPLICATIONS</A></LI>
 	<LI><A HREF="#known issues">KNOWN ISSUES</A></LI>
 	<LI><A HREF="#see also">SEE ALSO</A></LI>
 	<LI><A HREF="#author">AUTHOR</A></LI>
 	<LI><A HREF="#license">LICENSE</A></LI>
 	<LI><A HREF="#cvs id">CVS ID</A></LI>
+	<LI><A HREF="#update history">UPDATE HISTORY</A></LI>
 </UL>
 <!-- INDEX END -->
 
@@ -119,6 +121,7 @@ which is taken as the filename of the spreadsheet of as named arguments.</P>
                   skipHeadings  =&gt; 1,
                   skipBlankRows =&gt; 1,
                   log           =&gt; $log,
+                  oldCell       =&gt; 1,
               );</PRE>
 <P>The following named arguments are available:</P>
 <DL>
@@ -141,7 +144,15 @@ If not provided error conditions are logged to STDERR
 <DT><STRONG><A NAME="item_fileName">fileName</A></STRONG><BR>
 <DD>
 The name (and optionally path) of the spreadsheet file to process.
+<P></P>
+<DT><STRONG><A NAME="item_oldCell">oldCell</A></STRONG><BR>
+<DD>
+Empty cells returned undef pre version 1.5.  They now return ''.
+<P>The old functionality can be turned on by setting argument <EM>oldCell</EM> to true</P>
 <P></P></DL>
+<P><STRONG>Note that new will die if the spreadsheet can not be successfully opened.</STRONG>
+As such you may wish to wrap the call to new in a eval block. See <A HREF="#example applications">xlsgrep</A>
+for an example of when this might be desirable.</P>
 <P>
 <H2><A NAME="getnextrow()"><CODE>getNextRow()</CODE></A></H2>
 <P>Get the next row of data from the spreadsheet.  The data is
@@ -211,6 +222,26 @@ Level (see File::Log) then the message is added to the log file.</P>
 STDERR.</P>
 <P>
 <HR>
+<H1><A NAME="example applications">EXAMPLE APPLICATIONS</A></H1>
+<P>Two sample (but usefull) applications are included with this distribution.</P>
+<P>The simplest is dumpSS.pl which will dump the entire contents of a spreadsheet
+to STDOUT.  Each sheet is preceeded by the sheet name (enclosed in ***) on
+a line, followed by each row of the spreadsheet, with cell values separated by
+the pipe '|' character.  There is no special handling provided for cells containing
+the pipe character.</P>
+<P>A more complete example is xlsgrep.  This application can be used to do a perl
+pattern match for cell values within xls files in the current and sub directories.
+There are no special grep flags, however this should not be a problem since perl's
+pattern matching allows for most requirements within the search pattern.</P>
+<PRE>
+ Usage is: xlsgrep.pl pattern</PRE>
+<P>To do a case insensative search for ``Some value'' in any xls file in the current directory
+you would use:</P>
+<PRE>
+ xlsgrep '(?i)Some value'</PRE>
+<P>For further details, see each applications POD.</P>
+<P>
+<HR>
 <H1><A NAME="known issues">KNOWN ISSUES</A></H1>
 <P>None, however please contact the author at <A HREF="mailto:gng@cpan.org">gng@cpan.org</A> should you
 find any problems and I will endevour to resolve then as soon as
@@ -222,6 +253,7 @@ an email and I will try to accommodate your suggestion.</P>
 <H1><A NAME="see also">SEE ALSO</A></H1>
 <P>Spreadsheet:ParseExcel on CPAN does all the hard work, thanks
 Kawai Takanori (Hippo2000) <A HREF="mailto:kwitknr@cpan.org">kwitknr@cpan.org</A></P>
+<P>The included applications dumpSS.pl and xlsgrep.pl</P>
 <P>
 <HR>
 <H1><A NAME="author">AUTHOR</A></H1>
@@ -237,7 +269,29 @@ the same terms as Perl itself.</P>
 <P>
 <HR>
 <H1><A NAME="cvs id">CVS ID</A></H1>
-<P>$Id: BasicRead.pm,v 1.3 2004/09/30 12:32:25 Greg Exp $</P>
+<P>$Id: BasicRead.pm,v 1.5 2004/10/08 22:40:27 Greg Exp $</P>
+<P>
+<HR>
+<H1><A NAME="update history">UPDATE HISTORY</A></H1>
+<PRE>
+ $Log: BasicRead.pm,v $
+ Revision 1.5  2004/10/08 22:40:27  Greg
+ - Changed cellValue to return '' for an empty cell rather than undef (requested by D D Allen).  Old functionality can be maintained by setting named parameter 'oldCell' to true in call to new().
+ - Added examples to POD</PRE>
+<PRE>
+ Revision 1.4  2004/10/01 11:02:21  Greg
+ - Updated getNextRow to skip sheets that have nothing on them</PRE>
+<PRE>
+ Revision 1.3  2004/09/30 12:32:25  Greg
+ - Update to currentSheetNum and getNextSheet functions</PRE>
+<PRE>
+ Revision 1.2  2004/08/21 02:30:29  Greg
+ - Added setHeadingRow and setRow
+ - Updated documentation
+ - Remove irrelavant use lib;</PRE>
+<PRE>
+ Revision 1.1.1.1  2004/07/31 07:45:02  Greg
+ - Initial release to CPAN</PRE>
 
 </BODY>
 

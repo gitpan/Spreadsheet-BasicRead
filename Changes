@@ -1,5 +1,21 @@
 Revision history for Perl extension Spreadsheet::BasicRead.
 
+
+BasicRead
+Revision 1.5  2004/10/08 22:40:27  Greg
+- Changed cellValue to return '' for an empty cell rather than undef (requested by D D Allen).
+  Old functionality can be maintained by setting named parameter 'oldCell' to true in call to new().
+- Added examples to POD
+
+xlsgrep.pl
+Revision 1.4  2004/10/08 22:35:20  Greg
+- Wrap the open of each spreadsheet in an eval to trap the die
+- Add printing the name of each spreadsheet checked
+- Correct the printing of the column number
+- Added sample run output to POD
+
+Added xlsgrep.pl and dumpSS.pl examples.
+
 Revision 1.3  2004/09/30 12:32:25  Greg
 - Update to currentSheetNum and getNextSheet functions
 - Added dumpSS.pl and xlsgrep.pl applications as usefull sample apps.

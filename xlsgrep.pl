@@ -38,11 +38,14 @@ sub searchXLS
 	my $ss;
 
 	# Open the spreadsheet ready for reading
-	unless ($ss = new Spreadsheet::BasicRead($xlsFileName))
+	eval { $ss = new Spreadsheet::BasicRead($xlsFileName) };
+	if ($@)
 	{
-		print STDERR "Could not open '$fullPath': $!";
+		print STDERR "Could not open '$fullPath': $!\n";
 		return;
 	}
+
+	print STDERR "Checking $xlsFileName\n";
 
 
 	# Starting at the first sheet, process each row at a time
@@ -52,7 +55,7 @@ sub searchXLS
 		my $row = 0;
 		while (my $data = $ss->getNextRow())
 		{
-			my $col = 0;
+			my $cnt = 0;
 			foreach my $col (@$data)
 			{
 				next unless $col;
@@ -63,9 +66,9 @@ sub searchXLS
 					# We have a match, so print out the details
 					print "$fullPath : Sheet=",
 						$ss->currentSheetName(),
-						", Row=$row, Col=$col, Value=$col\n";
+						", Row=$row, Col=$cnt, Value=$col\n";
 				}
-				$col++;
+				$cnt++;
 			}
 			$row++;
 		}
@@ -87,9 +90,21 @@ xlsgrep.pl some_regex_pattern
 xlsgrep utilises the power of perls regular expressions to search every cell, on
 every sheet in any spreadsheets files found in the current directory or subdirectories.
 
-There are currently no switches supports.  Sum of the standard grep switches can be
+There are currently no switches supports.  Some of the standard grep switches can be
 handled using perls regular expression syntax.  The equivalent of the ignore case grep
 switch (-i) can be applied to I<pattern> by prefixing with B<(?i)> to give I<(?i)pattern>
+
+The name of each spreadsheet checked is printed followed by any matches.  The following is
+a typical run output
+
+ C:> perl xlsgrep.pl 7:45
+ Checking ITTS-GNG-040830.xls
+ ./ITTS-GNG-040830.xls : Sheet=Sheet1, Row=12, Col=2, Value=7:45
+ Checking ITTS-GNG-040906.xls
+ Checking ITTS-GNG-040920.xls
+
+Here all spreadsheets in the current and sub directories were searched for the string '7:45'
+which was found in the spreadsheet 'ITTS-GNG-040830.xls'.
 
 =head1 SEE ALSO
 
@@ -111,20 +126,25 @@ the same terms as Perl itself.
 
 =head1 CVS ID
 
-$Id: xlsgrep.pl,v 1.3 2004/10/03 04:58:20 Greg Exp $
+$Id: xlsgrep.pl,v 1.4 2004/10/08 22:35:20 Greg Exp $
 
 =head1 CVS LOG
 
-$Log: xlsgrep.pl,v $
-Revision 1.3  2004/10/03 04:58:20  Greg
-- Test of open of spreadsheet and return if failure
+ $Log: xlsgrep.pl,v $
+ Revision 1.4  2004/10/08 22:35:20  Greg
+ - Wrap the open of each spreadsheet in an eval to trap the die
+ - Add printing the name of each spreadsheet checked
+ - Correct the printing of the column number
+ - Added sample run output to POD
 
-Revision 1.2  2004/10/01 10:59:30  Greg
-- Replaced the die with print to STDERR when you can't open a spreadsheet
+ Revision 1.3  2004/10/03 04:58:20  Greg
+ - Test of open of spreadsheet and return if failure
 
-Revision 1.1  2004/09/30 12:31:26  Greg
-- Initial development
+ Revision 1.2  2004/10/01 10:59:30  Greg
+ - Replaced the die with print to STDERR when you can't open a spreadsheet
 
+ Revision 1.1  2004/09/30 12:31:26  Greg
+ - Initial development
 
 =cut
 
