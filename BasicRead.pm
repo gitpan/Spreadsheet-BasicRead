@@ -8,13 +8,16 @@
 #--------------------------------------------------
 package Spreadsheet::BasicRead;
 
-$VERSION = sprintf("%d.%02d", q'$Revision: 1.2 $' =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q'$Revision: 1.3 $' =~ /(\d+)\.(\d+)/);
 #--------------------------------------------------
 #
 #
 my $CVS_Log = q{
 
 $Log: BasicRead.pm,v $
+Revision 1.3  2004/09/30 12:32:25  Greg
+- Update to currentSheetNum and getNextSheet functions
+
 Revision 1.2  2004/08/21 02:30:29  Greg
 - Added setHeadingRow and setRow
 - Updated documentation
@@ -134,7 +137,7 @@ sub currentSheetNum
 {
 	my $self = shift;
 
-	return defined($self->{currentSheetNum}) ? $self->{currentSheetNum} : undef;
+	return defined($self->{currentSheetNum}) ? $self->{currentSheetNum} : 0;
 }
 
 
@@ -174,7 +177,7 @@ sub getNextSheet
 	# Get the next sheet
 	if (defined($self->{ssSheet}) && $currentSheet < $self->numSheets())
 	{
-		$self->setCurrentSheetNum = ++$currentSheet;
+		$self->setCurrentSheetNum(++$currentSheet);
 		$self->{ssSheet}    = $self->{ssBook}->{Worksheet}[$currentSheet];
 		$self->{ssSheetRow} = $self->{ssSheet}->{MinRow} if (defined($self->{ssSheet}));
 		$self->{ssSheetCol} = $self->{ssSheet}->{MinCol} if (defined($self->{ssSheet}));
@@ -575,7 +578,7 @@ the same terms as Perl itself.
 
 =head1 CVS ID
 
-$Id: BasicRead.pm,v 1.2 2004/08/21 02:30:29 Greg Exp $
+$Id: BasicRead.pm,v 1.3 2004/09/30 12:32:25 Greg Exp $
 
 =cut
 

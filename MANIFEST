@@ -4,5 +4,9 @@ Makefile.PL
 MANIFEST
 README
 test.pl
+xlsgrep.pl
+dumpSS.pl
 Test.xls
 BasicRead.html
+xlsgrep.html
+dumpSS.html
