@@ -2,6 +2,11 @@ Revision history for Perl extension Spreadsheet::BasicRead.
 
 
 BasicRead
+Revision 1.7  2006/01/25 22:17:47  Greg
+- Correction to reading of the first row of the next sheet (without calling getFirstRow).
+  Error detected and reported by Tim Rossiter
+- Reviewed memory useage as reported by Ilia Lobsanov - this seems to be in the underlying OLE::Storage_Lite
+
 Revision 1.6  2005/02/21 09:54:08  Greg
 - Update to setCurrentSheetNum() so that the new sheet is handled by BasicRead functions
 

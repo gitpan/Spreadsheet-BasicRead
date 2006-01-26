@@ -8,7 +8,7 @@
 #--------------------------------------------------
 package Spreadsheet::BasicRead;
 
-$VERSION = sprintf("%d.%02d", q'$Revision: 1.6 $' =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q'$Revision: 1.7 $' =~ /(\d+)\.(\d+)/);
 #--------------------------------------------------
 #
 
@@ -175,7 +175,8 @@ sub getNextSheet
 	{
 		$self->setCurrentSheetNum(++$currentSheet);
 		$self->{ssSheet}    = $self->{ssBook}->{Worksheet}[$currentSheet];
-		$self->{ssSheetRow} = $self->{ssSheet}->{MinRow} if (defined($self->{ssSheet}));
+#		$self->{ssSheetRow} = $self->{ssSheet}->{MinRow} if (defined($self->{ssSheet}));
+		$self->{ssSheetRow} = -7;	# So we then find the correct start, setting to min will skip the min row! - Thanks Tim Rossiter
 		$self->{ssSheetCol} = $self->{ssSheet}->{MinCol} if (defined($self->{ssSheet}));
 		return $self->{ssSheet};
 	}
@@ -614,12 +615,17 @@ the same terms as Perl itself.
 
 =head1 CVS ID
 
-$Id: BasicRead.pm,v 1.6 2005/02/21 09:54:08 Greg Exp $
+$Id: BasicRead.pm,v 1.7 2006/01/25 22:17:47 Greg Exp $
 
 
 =head1 UPDATE HISTORY
 
  $Log: BasicRead.pm,v $
+ Revision 1.7  2006/01/25 22:17:47  Greg
+ - Correction to reading of the first row of the next sheet (without calling getFirstRow).
+   Error detected and reported by Tim Rossiter
+ - Reviewed memory useage as reported by Ilia Lobsanov - this seems to be in the underlying OLE::Storage_Lite
+
  Revision 1.6  2005/02/21 09:54:08  Greg
  - Update to setCurrentSheetNum() so that the new sheet is handled by BasicRead functions
 
