@@ -8,7 +8,7 @@
 #--------------------------------------------------
 package Spreadsheet::BasicRead;
 
-$VERSION = sprintf("%d.%02d", q'$Revision: 1.7 $' =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q'$Revision: 1.9 $' =~ /(\d+)\.(\d+)/);
 #--------------------------------------------------
 #
 
@@ -202,7 +202,15 @@ sub cellValue
 {
 	my ($self, $r, $c) = @_;
 	return ($self->{oldCell}? undef : '') unless (defined($self->{ssSheet}) && defined($self->{ssSheet}->{Cells}[$r][$c]));
-	return $self->{ssSheet}->{Cells}[$r][$c]->Value;
+
+
+	#return $self->{ssSheet}->{Cells}[$r][$c]->Value;
+	# V1.8 2006/03/05 Changes to cater for OpenOffice returning 'GENERAL'
+	my $cell_value = $self->{ssSheet}->{Cells}[$r][$c]->Value;
+	if ( $cell_value eq 'GENERAL' ) {
+		   $cell_value = $self->{ssSheet}->{Cells}[$r][$c]->{Val};
+	}
+	return $cell_value;
 }
 
 
@@ -582,6 +590,13 @@ you would use:
 For further details, see each applications POD.
 
 
+=head1 ACKNOWLEDGEMENTS
+
+I would like to acknowledge the input and patches recieved from the following:
+
+Ilia Lobsanov, Bryan Maloney, Bill (from Datacraft), nadim and D. Dewey Allen
+
+
 =head1 KNOWN ISSUES
 
 None, however please contact the author at gng@cpan.org should you
@@ -615,12 +630,20 @@ the same terms as Perl itself.
 
 =head1 CVS ID
 
-$Id: BasicRead.pm,v 1.7 2006/01/25 22:17:47 Greg Exp $
+$Id: BasicRead.pm,v 1.9 2006/03/05 02:43:34 Greg Exp $
 
 
 =head1 UPDATE HISTORY
 
  $Log: BasicRead.pm,v $
+ Revision 1.9  2006/03/05 02:43:34  Greg
+ - Update of Acknowledgments
+
+ Revision 1.8  2006/03/05 02:31:41  Greg
+ - Changes to cellValue return to cater for 'GENERAL' value sometimes returned from OpenOffice spreadsheets
+   patch provided by Ilia Lobsanov <samogon@gmail.com>
+   see http://www.annocpan.org/~KWITKNR/Spreadsheet-ParseExcel-0.2602/ParseExcel.pm#note_18
+
  Revision 1.7  2006/01/25 22:17:47  Greg
  - Correction to reading of the first row of the next sheet (without calling getFirstRow).
    Error detected and reported by Tim Rossiter

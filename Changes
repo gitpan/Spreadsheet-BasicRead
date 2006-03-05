@@ -2,6 +2,12 @@ Revision history for Perl extension Spreadsheet::BasicRead.
 
 
 BasicRead
+
+ Revision 1.8  2006/03/05 02:31:41  Greg
+ - Changes to cellValue return to cater for 'GENERAL' value sometimes returned from OpenOffice spreadsheets
+   patch provided by Ilia Lobsanov <samogon@gmail.com>
+   see http://www.annocpan.org/~KWITKNR/Spreadsheet-ParseExcel-0.2602/ParseExcel.pm#note_18
+
 Revision 1.7  2006/01/25 22:17:47  Greg
 - Correction to reading of the first row of the next sheet (without calling getFirstRow).
   Error detected and reported by Tim Rossiter

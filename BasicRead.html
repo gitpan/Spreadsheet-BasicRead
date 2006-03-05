@@ -36,6 +36,7 @@
 	</UL>
 
 	<LI><A HREF="#example applications">EXAMPLE APPLICATIONS</A></LI>
+	<LI><A HREF="#acknowledgements">ACKNOWLEDGEMENTS</A></LI>
 	<LI><A HREF="#known issues">KNOWN ISSUES</A></LI>
 	<LI><A HREF="#see also">SEE ALSO</A></LI>
 	<LI><A HREF="#author">AUTHOR</A></LI>
@@ -242,6 +243,11 @@ you would use:</P>
 <P>For further details, see each applications POD.</P>
 <P>
 <HR>
+<H1><A NAME="acknowledgements">ACKNOWLEDGEMENTS</A></H1>
+<P>I would like to acknowledge the input and patches recieved from the following:</P>
+<P>Ilia Lobsanov, Bryan Maloney, Bill (from Datacraft), nadim and D. Dewey Allen</P>
+<P>
+<HR>
 <H1><A NAME="known issues">KNOWN ISSUES</A></H1>
 <P>None, however please contact the author at <A HREF="mailto:gng@cpan.org">gng@cpan.org</A> should you
 find any problems and I will endevour to resolve then as soon as
@@ -269,12 +275,20 @@ the same terms as Perl itself.</P>
 <P>
 <HR>
 <H1><A NAME="cvs id">CVS ID</A></H1>
-<P>$Id: BasicRead.pm,v 1.7 2006/01/25 22:17:47 Greg Exp $</P>
+<P>$Id: BasicRead.pm,v 1.9 2006/03/05 02:43:34 Greg Exp $</P>
 <P>
 <HR>
 <H1><A NAME="update history">UPDATE HISTORY</A></H1>
 <PRE>
  $Log: BasicRead.pm,v $
+ Revision 1.9  2006/03/05 02:43:34  Greg
+ - Update of Acknowledgments</PRE>
+<PRE>
+ Revision 1.8  2006/03/05 02:31:41  Greg
+ - Changes to cellValue return to cater for 'GENERAL' value sometimes returned from OpenOffice spreadsheets
+   patch provided by Ilia Lobsanov &lt;samogon@gmail.com&gt;
+   see <A HREF="http://www.annocpan.org/~KWITKNR/Spreadsheet-ParseExcel-0.2602/ParseExcel.pm#note_18">http://www.annocpan.org/~KWITKNR/Spreadsheet-ParseExcel-0.2602/ParseExcel.pm#note_18</A></PRE>
+<PRE>
  Revision 1.7  2006/01/25 22:17:47  Greg
  - Correction to reading of the first row of the next sheet (without calling getFirstRow).
    Error detected and reported by Tim Rossiter
