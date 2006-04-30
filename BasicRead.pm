@@ -8,7 +8,7 @@
 #--------------------------------------------------
 package Spreadsheet::BasicRead;
 
-$VERSION = sprintf("%d.%02d", q'$Revision: 1.9 $' =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q'$Revision: 1.10 $' =~ /(\d+)\.(\d+)/);
 #--------------------------------------------------
 #
 
@@ -27,84 +27,84 @@ our @ISA = qw( Spreadsheet::ParseExcel );
 
 sub new
 {
-	my $proto  = shift;
-	my $class  = ref($proto) || $proto;
+    my $proto  = shift;
+    my $class  = ref($proto) || $proto;
 
-	my $self = {};
-	bless($self, $class);
+    my $self = {};
+    bless($self, $class);
 
-	$self->{skipBlankRows} = 0;
-	$self->{oldCell}       = 0;
+    $self->{skipBlankRows} = 0;
+    $self->{oldCell}       = 0;
 
-	# Do we have any arguments to process
-	#------------------------------------
+    # Do we have any arguments to process
+    #------------------------------------
 
-	# Is there just one argument?  If so treat as filename, otherwise assume named arguments
-	if (@_ == 1)
-	{
-		$self->{fileName} = $_[0];
-		$self->openSpreadsheet($self->{fileName});
+    # Is there just one argument?  If so treat as filename, otherwise assume named arguments
+    if (@_ == 1)
+    {
+        $self->{fileName} = $_[0];
+        $self->openSpreadsheet($self->{fileName});
 
-		return $self;
-	}
+        return $self;
+    }
 
 
 
-	# If we get to here then we assume named arguments to process
-	my %args = @_;
+    # If we get to here then we assume named arguments to process
+    my %args = @_;
 
-	# Is there a log object
-	if (defined($args{log}) && $args{log} ne '')
-	{
-		$self->{log} = $args{log};
-	}
+    # Is there a log object
+    if (defined($args{log}) && $args{log} ne '')
+    {
+        $self->{log} = $args{log};
+    }
 
-	# Do we skip blank rows
-	if (defined($args{skipBlankRows}))
-	{
-		$self->{skipBlankRows} = $args{skipBlankRows} ? 1 : 0;
-	}
+    # Do we skip blank rows
+    if (defined($args{skipBlankRows}))
+    {
+        $self->{skipBlankRows} = $args{skipBlankRows} ? 1 : 0;
+    }
 
-	# Is there a file to open
-	if (defined($args{fileName}) && $args{fileName} ne '')
-	{
-		$self->{fileName} = $args{fileName};
-		$self->openSpreadsheet($args{fileName});
-	}
+    # Is there a file to open
+    if (defined($args{fileName}) && $args{fileName} ne '')
+    {
+        $self->{fileName} = $args{fileName};
+        $self->openSpreadsheet($args{fileName});
+    }
 
-	# Skip headings (if defined) else skip the first row
-	if (defined $args{skipHeadings})
-	{
-		$self->{skipHeadings} = $args{skipHeadings};
-	}
+    # Skip headings (if defined) else skip the first row
+    if (defined $args{skipHeadings})
+    {
+        $self->{skipHeadings} = $args{skipHeadings};
+    }
 
-	# Do we return undef on empty cells (old mode) or ''
-	$self->{oldCell} = $args{oldCell} if $args{oldCell};
+    # Do we return undef on empty cells (old mode) or ''
+    $self->{oldCell} = $args{oldCell} if $args{oldCell};
 
-	return $self;
+    return $self;
 }
 
 
 sub openSpreadsheet
 {
-	my ($self, $ssFileName) = @_;
+    my ($self, $ssFileName) = @_;
 
-	#-- Open the Excel spreadsheet and process
-	my $ssExcel = new Spreadsheet::ParseExcel;
-	my $ssBook  = $ssExcel->Parse($ssFileName);
-	unless ($ssBook)
-	{
-		$self->logexp("Could not open Excel spreadsheet file '$ssFileName': $!");
-	}
+    #-- Open the Excel spreadsheet and process
+    my $ssExcel = new Spreadsheet::ParseExcel;
+    my $ssBook  = $ssExcel->Parse($ssFileName);
+    unless ($ssBook)
+    {
+        $self->logexp("Could not open Excel spreadsheet file '$ssFileName': $!");
+    }
 
-	# Store the objects
-	$self->{ssExcel} = $ssExcel;
-	$self->{ssBook}  = $ssBook;
+    # Store the objects
+    $self->{ssExcel} = $ssExcel;
+    $self->{ssBook}  = $ssBook;
 
-	# Get the first sheet
-	$self->getFirstSheet();
+    # Get the first sheet
+    $self->getFirstSheet();
 
-	return ($ssExcel, $ssBook)
+    return ($ssExcel, $ssBook)
 }
 
 
@@ -112,225 +112,231 @@ sub openSpreadsheet
 
 sub numSheets
 {
-	my $self = shift;
+    my $self = shift;
 
-	return defined($self->{ssBook}) ? $self->{ssBook}->{SheetCount} : undef;
+    return defined($self->{ssBook}) ? $self->{ssBook}->{SheetCount} : undef;
 }
 
 
 
 sub currentSheetNum
 {
-	my $self = shift;
+    my $self = shift;
 
-	return defined($self->{currentSheetNum}) ? $self->{currentSheetNum} : 0;
+    return defined($self->{currentSheetNum}) ? $self->{currentSheetNum} : 0;
 }
 
 
 
 sub currentSheetName
 {
-	my $self = shift;
+    my $self = shift;
 
-	return defined($self->{ssSheet}) ? $self->{ssSheet}->{Name} : undef;
+    return defined($self->{ssSheet}) ? $self->{ssSheet}->{Name} : undef;
 }
 
 
 
 sub setCurrentSheetNum
 {
-	my $self  = shift;
-	my $shtNo = shift || 0;
+    my $self  = shift;
+    my $shtNo = shift || 0;
 
-	# Check if this is a valid value
-	return undef unless ($shtNo >= 0 && $shtNo <= $self->numSheets());
+    # Check if this is a valid value
+    return undef unless ($shtNo >= 0 && $shtNo <= $self->numSheets());
 
-	# Set the new sheet number and return the sheet.
-	$self->{currentSheetNum} = $shtNo;
-	$self->{ssSheet}         = $self->{ssBook}->{Worksheet}[$shtNo];
-	$self->{ssSheetRow}      = $self->{ssSheet}->{MinRow} if (defined($self->{ssSheet}));
-	$self->{ssSheetCol}      = $self->{ssSheet}->{MinCol} if (defined($self->{ssSheet}));
-	$self->{ssSheetRow}      = -7;  # Flag to getNextRow that this is the first row
-	return $self->{ssSheet};
+    # Set the new sheet number and return the sheet.
+    $self->{currentSheetNum} = $shtNo;
+    $self->{ssSheet}         = $self->{ssBook}->{Worksheet}[$shtNo];
+    $self->{ssSheetRow}      = $self->{ssSheet}->{MinRow} if (defined($self->{ssSheet}));
+    $self->{ssSheetCol}      = $self->{ssSheet}->{MinCol} if (defined($self->{ssSheet}));
+    $self->{ssSheetRow}      = -7;  # Flag to getNextRow that this is the first row
+    return $self->{ssSheet};
 }
 
 
 sub skipHeadings
 {
-	$_[0]->{skipHeadings} = $_[1] || 0;
+    $_[0]->{skipHeadings} = $_[1] || 0;
 }
 
 
 sub getNextSheet
 {
-	my $self = shift;
+    my $self = shift;
 
-	my $currentSheet = $self->currentSheetNum();
+    my $currentSheet = $self->currentSheetNum();
 
-	# No sheet, so get the first sheet
-	return $self->getFirstSheet() unless (defined($self->{ssSheet}));
+    # No sheet, so get the first sheet
+    return $self->getFirstSheet() unless (defined($self->{ssSheet}));
 
-	# Get the next sheet
-	if (defined($self->{ssSheet}) && $currentSheet < $self->numSheets())
-	{
-		$self->setCurrentSheetNum(++$currentSheet);
-		$self->{ssSheet}    = $self->{ssBook}->{Worksheet}[$currentSheet];
-#		$self->{ssSheetRow} = $self->{ssSheet}->{MinRow} if (defined($self->{ssSheet}));
-		$self->{ssSheetRow} = -7;	# So we then find the correct start, setting to min will skip the min row! - Thanks Tim Rossiter
-		$self->{ssSheetCol} = $self->{ssSheet}->{MinCol} if (defined($self->{ssSheet}));
-		return $self->{ssSheet};
-	}
+    # Get the next sheet
+    if (defined($self->{ssSheet}) && $currentSheet < $self->numSheets())
+    {
+        $self->setCurrentSheetNum(++$currentSheet);
+        $self->{ssSheet}    = $self->{ssBook}->{Worksheet}[$currentSheet];
+#       $self->{ssSheetRow} = $self->{ssSheet}->{MinRow} if (defined($self->{ssSheet}));
+        $self->{ssSheetRow} = -7;   # So we then find the correct start, setting to min will skip the min row! - Thanks Tim Rossiter
+        $self->{ssSheetCol} = $self->{ssSheet}->{MinCol} if (defined($self->{ssSheet}));
+        return $self->{ssSheet};
+    }
 
-	return undef;
+    return undef;
 }
 
 
 
 sub getFirstSheet
 {
-	my $self = shift;
+    my $self = shift;
 
-	$self->{setCurrentSheetNum} = 0;
-	$self->{ssSheet}    = $self->{ssBook}->{Worksheet}[0] if (defined($self->{ssBook}));
-	$self->{ssSheetRow} = -7;  # Flag to getNextRow that this is the first row
-	$self->{ssSheetCol} = $self->{ssSheet}->{MinCol}      if (defined($self->{ssSheet}));
-	return $self->{ssSheet};
+    $self->{setCurrentSheetNum} = 0;
+    $self->{ssSheet}    = $self->{ssBook}->{Worksheet}[0] if (defined($self->{ssBook}));
+    $self->{ssSheetRow} = -7;  # Flag to getNextRow that this is the first row
+    $self->{ssSheetCol} = $self->{ssSheet}->{MinCol}      if (defined($self->{ssSheet}));
+    return $self->{ssSheet};
 }
 
 
 sub cellValue
 {
-	my ($self, $r, $c) = @_;
-	return ($self->{oldCell}? undef : '') unless (defined($self->{ssSheet}) && defined($self->{ssSheet}->{Cells}[$r][$c]));
+    my ($self, $r, $c) = @_;
+    return ($self->{oldCell}? undef : '') unless (defined($self->{ssSheet}) && defined($self->{ssSheet}->{Cells}[$r][$c]));
 
 
-	#return $self->{ssSheet}->{Cells}[$r][$c]->Value;
-	# V1.8 2006/03/05 Changes to cater for OpenOffice returning 'GENERAL'
-	my $cell_value = $self->{ssSheet}->{Cells}[$r][$c]->Value;
-	if ( $cell_value eq 'GENERAL' ) {
-		   $cell_value = $self->{ssSheet}->{Cells}[$r][$c]->{Val};
-	}
-	return $cell_value;
+    #return $self->{ssSheet}->{Cells}[$r][$c]->Value;
+    # V1.8 2006/03/05 Changes to cater for OpenOffice returning 'GENERAL'
+    my $cell_value = $self->{ssSheet}->{Cells}[$r][$c]->Value;
+    if ( $cell_value eq 'GENERAL' ) {
+           $cell_value = $self->{ssSheet}->{Cells}[$r][$c]->{Val};
+    }
+    return $cell_value;
 }
 
 
 
 sub setHeadingRow
 {
-	my $self = shift;
-	my $headingRow = shift;
+    my $self = shift;
+    my $headingRow = shift;
 
-	$self->{headingRow} = ($headingRow >= $self->{ssSheet}->{MinRow} &&
-	                       $headingRow <= $self->{ssSheet}->{MaxRow}) ?
-						   $headingRow : $self->{ssSheet}->{MinRow};
+    $self->{headingRow} = ($headingRow >= $self->{ssSheet}->{MinRow} &&
+                           $headingRow <= $self->{ssSheet}->{MaxRow}) ?
+                           $headingRow : $self->{ssSheet}->{MinRow};
 }
 
 
 sub getFirstRow
 {
-	my $self = shift;
+    my $self = shift;
 
-	return undef unless defined($self->{ssSheet});
+    return undef unless defined($self->{ssSheet});
 
-	my $row = $self->{headingRow} || $self->{ssSheet}->{MinRow};
-	$self->{ssSheetRow} = $row;
-
-
-	# Loop through each column and put into array
-	my $x     = 0;
-	my @data  = ();
-	my $blank = 0;
-	for (my $col = $self->{ssSheet}->{MinCol}; $col <= $self->{ssSheet}->{MaxCol}; $x++, $col++)
-	{
-		no warnings qw(uninitialized);
-
-		# Note that this is the formatted value of the cell (ie what you see, no the real value)
-		$data[$x] = $self->cellValue($row, $col);
-
-		# remove leading and trailing whitespace
-		$data[$x] =~ s/^\s+//;
-		$data[$x] =~ s/\s+$//;
-		$blank++ unless $data[$x] =~ /^$/;
-	}
+    my $row = $self->{headingRow} || $self->{ssSheet}->{MinRow};
+    $self->{ssSheetRow} = $row;
 
 
-	return ($self->{skipHeadings} || ($self->{skipBlankRows} && $blank == 0)) ? $self->getNextRow() : \@data;
+    # Loop through each column and put into array
+    my $x     = 0;
+    my @data  = ();
+    my $blank = 0;
+    for (my $col = $self->{ssSheet}->{MinCol}; $col <= $self->{ssSheet}->{MaxCol}; $x++, $col++)
+    {
+        no warnings qw(uninitialized);
+
+        # Note that this is the formatted value of the cell (ie what you see, no the real value)
+        $data[$x] = $self->cellValue($row, $col);
+
+        # remove leading and trailing whitespace
+        $data[$x] =~ s/^\s+//;
+        $data[$x] =~ s/\s+$//;
+        $blank++ unless $data[$x] =~ /^$/;
+    }
+
+
+    return ($self->{skipHeadings} || ($self->{skipBlankRows} && $blank == 0)) ? $self->getNextRow() : \@data;
 }
 
 
 
 sub getNextRow
 {
-	my $self = shift;
+    my $self = shift;
 
-	# Must have a sheet defined
-	return undef unless defined($self->{ssSheet});
+    # Must have a sheet defined
+    return undef unless defined($self->{ssSheet});
 
-	# Find the next row and make sure it's valid
-	my $row = ++$self->{ssSheetRow};
-	# Check to make sure there is something on this sheet
-	return undef if (! defined($self->{ssSheet}->{MaxRow}) || $row > $self->{ssSheet}->{MaxRow});
+    # Find the next row and make sure it's valid
+    my $row = ++$self->{ssSheetRow};
+    # Check to make sure there is something on this sheet
+    return undef if (! defined($self->{ssSheet}->{MaxRow}) || $row > $self->{ssSheet}->{MaxRow});
 
-	# If row is zero or negative then this is the first row
-	return $self->getFirstRow() if ($row <= 0);
+    # If row is zero or negative then this is the first row
+    return $self->getFirstRow() if ($row <= 0);
 
 
-	# Loop through each column and put into array
-	my $x     = 0;
-	my @data  = ();
-	my $blank = 0;
-	for (my $col = $self->{ssSheet}->{MinCol}; $col <= $self->{ssSheet}->{MaxCol}; $x++, $col++)
-	{
-		no warnings qw(uninitialized);
+    # Loop through each column and put into array
+    my $x     = 0;
+    my @data  = ();
+    my $blank = 0;
+    for (my $col = $self->{ssSheet}->{MinCol}; $col <= $self->{ssSheet}->{MaxCol}; $x++, $col++)
+    {
+        no warnings qw(uninitialized);
 
-		# Note that this is the formatted value of the cell (ie what you see, no the real value)
-		$data[$x] = $self->cellValue($row, $col);
+        # Note that this is the formatted value of the cell (ie what you see, no the real value)
+        $data[$x] = $self->cellValue($row, $col);
 
-		# remove leading and trailing whitespace
-		$data[$x] =~ s/^\s+//;
-		$data[$x] =~ s/\s+$//;
-		$blank++ unless $data[$x] =~ /^$/;
-	}
+        # remove leading and trailing whitespace
+        $data[$x] =~ s/^\s+//;
+        $data[$x] =~ s/\s+$//;
+        $blank++ unless $data[$x] =~ /^$/;
+    }
 
-	return ($self->{skipBlankRows} && $blank == 0) ? $self->getNextRow() : \@data;
+    return ($self->{skipBlankRows} && $blank == 0) ? $self->getNextRow() : \@data;
 }
 
 
 sub setRow
 {
-	$_[0]->{ssSheetRow} = ($_[1] || 0) -1;
+    $_[0]->{ssSheetRow} = ($_[1] || 0) - 1;
+}
+
+
+sub getRowNumber
+{
+    return $_[0]->{ssSheetRow} || -1;
 }
 
 
 sub logexp
 {
-	my $self = shift;
+    my $self = shift;
 
-	my $msg = join('', @_);
-	if (defined $self->{log})
-	{
-		$self->{log}->exp($msg);
-	}
+    my $msg = join('', @_);
+    if (defined $self->{log})
+    {
+        $self->{log}->exp($msg);
+    }
 
-	die $msg;
+    die $msg;
 }
 
 
 
 sub logmsg
 {
-	my $self  = shift;
-	my $level = shift;
+    my $self  = shift;
+    my $level = shift;
 
-	my $msg = join('', @_);
-	if (defined $self->{log})
-	{
-		$self->{log}->msg($level, $msg);
-	}
-	else
-	{
-		print STDERR $msg;
-	}
+    my $msg = join('', @_);
+    if (defined $self->{log})
+    {
+        $self->{log}->msg($level, $msg);
+    }
+    else
+    {
+        print STDERR $msg;
+    }
 }
 
 
@@ -371,15 +377,15 @@ Properties can also be set to skip the heading row.
  my $xlsFileName = 'Test.xls';
 
  my $ss = new Spreadsheet::BasicRead($xlsFileName) ||
- 	die "Could not open '$xlsFileName': $!";
+    die "Could not open '$xlsFileName': $!";
 
  # Print the row number and data for each row of the
  # spreadsheet to stdout using '|' as a separator
  my $row = 0;
  while (my $data = $ss->getNextRow())
  {
- 	$row++;
- 	print join('|', $row, @$data), "\n";
+    $row++;
+    print join('|', $row, @$data), "\n";
  }
 
  # Print the number of sheets
@@ -549,6 +555,13 @@ unless skip heading row has been set, in which case it will be the row after the
 heading row.
 
 
+=head2 getRowNumber()
+
+Returns the number of the current row (that has been retrieved).  Note that
+row numbers are zero indexed.  If a row has not been retrieved as yet, -1 is
+returned.
+
+
 =head2 logexp(message)
 
 Logs an exception message (can be a list of strings) using the File::Log
@@ -630,12 +643,15 @@ the same terms as Perl itself.
 
 =head1 CVS ID
 
-$Id: BasicRead.pm,v 1.9 2006/03/05 02:43:34 Greg Exp $
+$Id: BasicRead.pm,v 1.10 2006/04/30 05:35:13 Greg Exp $
 
 
 =head1 UPDATE HISTORY
 
  $Log: BasicRead.pm,v $
+ Revision 1.10  2006/04/30 05:35:13  Greg
+ - added getRowNumber()
+
  Revision 1.9  2006/03/05 02:43:34  Greg
  - Update of Acknowledgments
 

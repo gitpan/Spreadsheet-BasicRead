@@ -31,6 +31,7 @@
 		<LI><A HREF="#getfirstrow()"><CODE>getFirstRow()</CODE></A></LI>
 		<LI><A HREF="#setheadingrow(rownumber)"><CODE>setHeadingRow(rowNumber)</CODE></A></LI>
 		<LI><A HREF="#setrow(rownumber)"><CODE>setRow(rowNumber)</CODE></A></LI>
+		<LI><A HREF="#getrownumber()"><CODE>getRowNumber()</CODE></A></LI>
 		<LI><A HREF="#logexp(message)"><CODE>logexp(message)</CODE></A></LI>
 		<LI><A HREF="#logmsg(debug, message)">logmsg(debug, message)</A></LI>
 	</UL>
@@ -73,15 +74,15 @@ Properties can also be set to skip the heading row.</P>
  my $xlsFileName = 'Test.xls';</PRE>
 <PRE>
  my $ss = new Spreadsheet::BasicRead($xlsFileName) ||
-        die &quot;Could not open '$xlsFileName': $!&quot;;</PRE>
+    die &quot;Could not open '$xlsFileName': $!&quot;;</PRE>
 <PRE>
  # Print the row number and data for each row of the
  # spreadsheet to stdout using '|' as a separator
  my $row = 0;
  while (my $data = $ss-&gt;getNextRow())
  {
-        $row++;
-        print join('|', $row, @$data), &quot;\n&quot;;
+    $row++;
+    print join('|', $row, @$data), &quot;\n&quot;;
  }</PRE>
 <PRE>
  # Print the number of sheets
@@ -211,6 +212,11 @@ is less than the heading row, data will be returned from the heading row regardl
 unless skip heading row has been set, in which case it will be the row after the
 heading row.</P>
 <P>
+<H2><A NAME="getrownumber()"><CODE>getRowNumber()</CODE></A></H2>
+<P>Returns the number of the current row (that has been retrieved).  Note that
+row numbers are zero indexed.  If a row has not been retrieved as yet, -1 is
+returned.</P>
+<P>
 <H2><A NAME="logexp(message)"><CODE>logexp(message)</CODE></A></H2>
 <P>Logs an exception message (can be a list of strings) using the File::Log
 object if it was defined and then calls die message.</P>
@@ -275,12 +281,15 @@ the same terms as Perl itself.</P>
 <P>
 <HR>
 <H1><A NAME="cvs id">CVS ID</A></H1>
-<P>$Id: BasicRead.pm,v 1.9 2006/03/05 02:43:34 Greg Exp $</P>
+<P>$Id: BasicRead.pm,v 1.10 2006/04/30 05:35:13 Greg Exp $</P>
 <P>
 <HR>
 <H1><A NAME="update history">UPDATE HISTORY</A></H1>
 <PRE>
  $Log: BasicRead.pm,v $
+ Revision 1.10  2006/04/30 05:35:13  Greg
+ - added getRowNumber()</PRE>
+<PRE>
  Revision 1.9  2006/03/05 02:43:34  Greg
  - Update of Acknowledgments</PRE>
 <PRE>
