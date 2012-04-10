@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Spreadsheet-BasicRead
+version:            1.11
+abstract:           Methods to easily read data from spreadsheets (.xls and .xlxs)
+author:
+    - Greg George, IT Technology Solutions P/L, Australia, gng@cpan.org
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Spreadsheet::ParseExcel:  0.26
+    Spreadsheet::XLSX:    0.13
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

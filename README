@@ -1,4 +1,4 @@
-Spreadsheet/BasicRead version 1.10
+Spreadsheet/BasicRead version 1.11
 ==================================
 
 Provides methods for simple reading of a Excel spreadsheet row
@@ -9,6 +9,7 @@ There are a number of other properties that can be set.
 The aim is to make reading from Excel spreadsheets as
 easy as processing a text file
 
+As of version 1.11 also handles .xlsx files
 
 INSTALLATION
 ------------
@@ -24,7 +25,7 @@ To install this module type the following:
 DEPENDENCIES
 ------------
 
-This module requires Spreadsheet::ParseExcel and optionally
+This module requires Spreadsheet::ParseExcel, Spreadsheet::XLSX and optionally
 module File::Log can be used to allow simple logging of errors.
 
 Both are available from CPAN

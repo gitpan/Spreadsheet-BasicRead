@@ -8,7 +8,7 @@
 #--------------------------------------------------
 package Spreadsheet::BasicRead;
 
-$VERSION = sprintf("%d.%02d", q'$Revision: 1.10 $' =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q'$Revision: 1.11 $' =~ /(\d+)\.(\d+)/);
 #--------------------------------------------------
 #
 
@@ -17,7 +17,7 @@ $VERSION = sprintf("%d.%02d", q'$Revision: 1.10 $' =~ /(\d+)\.(\d+)/);
 use strict;
 use warnings;
 use Spreadsheet::ParseExcel;
-
+use Spreadsheet::XLSX;
 
 
 #-- Linage
@@ -90,8 +90,19 @@ sub openSpreadsheet
     my ($self, $ssFileName) = @_;
 
     #-- Open the Excel spreadsheet and process
-    my $ssExcel = new Spreadsheet::ParseExcel;
-    my $ssBook  = $ssExcel->Parse($ssFileName);
+    my $ssExcel;
+    my $ssBook;
+    if ($ssFileName =~ /\.xlsx$/i)
+    {
+        $ssExcel = Spreadsheet::XLSX->new($ssFileName);
+        $ssBook  = $ssExcel;
+    }
+    else
+    {
+        $ssExcel = new Spreadsheet::ParseExcel;
+        $ssBook  = $ssExcel->Parse($ssFileName);
+    }
+
     unless ($ssBook)
     {
         $self->logexp("Could not open Excel spreadsheet file '$ssFileName': $!");
@@ -352,7 +363,7 @@ __END__
 
 =head1 NAME
 
-Spreadsheet::BasicRead - Methods to easily read data from spreadsheets
+Spreadsheet::BasicRead - Methods to easily read data from spreadsheets (.xls and .xlxs)
 
 
 =head1 DESCRIPTION
@@ -369,6 +380,7 @@ Properties can also be set to skip the heading row.
  Note 2. Row and column references are zero (0) indexed. That is cell
          A1 is row 0, column 0
 
+ Note 3. Now handles .xlxs files
 
 =head1 SYNOPSIS
 
@@ -409,6 +421,7 @@ Properties can also be set to skip the heading row.
 The following modules are required:
 
  Spreadsheet::ParseExcel
+ Spreadsheet::XLSX
 
 Optional module File::Log can be used to allow simple logging of errors.
 
@@ -643,12 +656,15 @@ the same terms as Perl itself.
 
 =head1 CVS ID
 
-$Id: BasicRead.pm,v 1.10 2006/04/30 05:35:13 Greg Exp $
+$Id: BasicRead.pm,v 1.11 2012/04/10 11:08:42 Greg Exp $
 
 
 =head1 UPDATE HISTORY
 
  $Log: BasicRead.pm,v $
+ Revision 1.11  2012/04/10 11:08:42  Greg
+ - Added handling of .xlxs files
+
  Revision 1.10  2006/04/30 05:35:13  Greg
  - added getRowNumber()
 

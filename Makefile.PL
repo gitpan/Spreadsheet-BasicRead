@@ -2,9 +2,12 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-    'NAME'		=> 'Spreadsheet::BasicRead',
-    'VERSION_FROM'	=> 'BasicRead.pm', # finds $VERSION
-    'PREREQ_PM'		=> { Spreadsheet::ParseExcel => 0.26 },
+    'NAME'      => 'Spreadsheet::BasicRead',
+    'VERSION_FROM'  => 'BasicRead.pm', # finds $VERSION
+    'PREREQ_PM'     => {
+        Spreadsheet::ParseExcel => 0.26,
+        Spreadsheet::XLSX => 0.13,
+        },
     'NEEDS_LINKING' => 0,
     'EXE_FILES'     => [ qw(xlsgrep.pl dumpSS.pl) ],
 #    'HTMLSCRIPTPODS' => { 'xlsgrep.pl' => 'xlsgrep.html',},
